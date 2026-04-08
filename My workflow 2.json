@@ -1,0 +1,224 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Instagram AI agent",
+        "formDescription": "The Instagram AI Agent for Lead Generation is an intelligent automation system designed to identify, engage, and convert potential customers directly through Instagram. By leveraging artificial intelligence and natural language processing, the agent interacts with users in a personalized and human-like manner, helping businesses capture high-quality leads efficiently.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "What are you looking for?",
+              "placeholder": "search keywords"
+            },
+            {
+              "fieldLabel": "location",
+              "placeholder": "location",
+              "defaultValue": "worldwide"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        48,
+        0
+      ],
+      "id": "cd816838-9d9a-4af9-84da-830c52bfbaaa",
+      "name": "On form submission",
+      "webhookId": "512f1d2c-bac6-4849-93d6-d306fe8a1087"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~google-search-scraper/run-sync-get-dataset-items?token=apify_api_AWeKsvRgLFS6232M88dChiNtNuiNhO3qMdWD",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chatGptSearch\": {\n        \"enableChatGpt\": false\n    },\n    \"disableGoogleSearchResults\": false,\n    \"focusOnPaidAds\": false,\n    \"forceExactMatch\": false,\n    \"includeIcons\": false,\n    \"includeUnfilteredResults\": false,\n    \"maxPagesPerQuery\": 1,\n    \"maximumLeadsEnrichmentRecords\": 0,\n    \"mobileResults\": false,\n    \"perplexitySearch\": {\n        \"enablePerplexity\": false,\n        \"returnImages\": false,\n        \"returnRelatedQuestions\": false\n    },\n    \"queries\": \"site:instagram.com/{{ $json['What are you looking for?'] }}{{ $json.location }}\",\n    \"resultsPerPage\": 100,\n    \"saveHtml\": false,\n    \"saveHtmlToKeyValueStore\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c354665b-77f6-4159-90fc-54b8a1323268",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = items.map((item) => {\n  const { title, url, description, position } = item.json;\n  return { title, url, description, position };\n});\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        0
+      ],
+      "id": "0815e057-a81e-4924-a9b1-71b65ea6497f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1La5IjWoMSeCCygxR2MQ0XdeZuuGf1Lds_fC1vi7xcIU",
+          "mode": "list",
+          "cachedResultName": "Lead gen agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1La5IjWoMSeCCygxR2MQ0XdeZuuGf1Lds_fC1vi7xcIU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Title": "={{ $json.title }}",
+            "Profile URL": "={{ $json.url }}",
+            "Description": "={{ $json.description }}",
+            "Position": "={{ $json.position }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Profile URL",
+              "displayName": "Profile URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        0
+      ],
+      "id": "196e2fbf-3a3b-4456-a435-6a386878685a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GyvxUoLnqAwiDpIn",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": " organicResults",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ],
+      "id": "62f3b6ea-4e06-4c26-ab6d-320022869fff",
+      "name": "Split Out"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f0f9a222-2540-4a38-8d2f-f1b402b08d4d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0b4f475a3bb06d78914422115f2f4a0e76855af4ba98b4ff666d1863e618904b"
+  },
+  "id": "q1ov2OGScQJrfjAn",
+  "tags": []
+}
