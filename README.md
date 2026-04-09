@@ -107,5 +107,3 @@ Feel free to fork this repository and submit pull requests. Any improvements or 
 **Made with ❤️ using n8n**
 
 ---
-
-*If you found this workflow useful, please give it a ⭐ on GitHub!*
